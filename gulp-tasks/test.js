@@ -11,23 +11,10 @@ var paths = {
     test: './test'
 };
 
-gulp.task('unit:phone', function () {
-    return gulp.src(path.join(paths.test, 'PhoneFormatter_spec.js'), {read: false})
-        .pipe(mocha({reporter: 'spec'}));
-});
 
-gulp.task('unit:credit-card', function () {
-    return gulp.src(path.join(paths.test, 'CreditCardDetector_spec.js'), {read: false})
-        .pipe(mocha({reporter: 'spec'}));
-});
 
 gulp.task('unit:date', function () {
     return gulp.src(path.join(paths.test, 'DateFormatter_spec.js'), {read: false})
-        .pipe(mocha({reporter: 'spec'}));
-});
-
-gulp.task('unit:numeral', function () {
-    return gulp.src(path.join(paths.test, 'NumeralFormatter_spec.js'), {read: false})
         .pipe(mocha({reporter: 'spec'}));
 });
 

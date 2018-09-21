@@ -1,11 +1,20 @@
 {
   "name": "cleave.js",
   "title": "cleave.js",
-  "description":
-    "JavaScript library for formatting input text content when you are typing",
-  "keywords": ["cleave", "javascript", "html", "format", "form", "input"],
+  "description": "JavaScript library for formatting input text content when you are typing",
+  "keywords": [
+    "cleave",
+    "javascript",
+    "html",
+    "format",
+    "form",
+    "input"
+  ],
   "version": "1.4.4",
-  "files": ["src", "dist", "react.js"],
+  "files": [
+    "src",
+    "dist"
+  ],
   "author": {
     "name": "Max Huang",
     "url": "http://github.com/nosir",
@@ -31,9 +40,7 @@
     "babel-preset-react": "^6.5.0",
     "babel-preset-stage-0": "^6.5.0",
     "babelify": "^7.3.0",
-    "browserify": "^13.0.1",
     "chai": "^3.5.0",
-    "create-react-class": "^15.5.2",
     "del": "^3.0.0",
     "errorify": "^0.3.1",
     "eslint-plugin-react": "^5.2.2",
@@ -48,8 +55,6 @@
     "gulp-sync": "^0.1.4",
     "gulp-uglify": "^1.5.3",
     "mocha": "^3.1.2",
-    "react": "^15.1.0",
-    "react-dom": "^15.1.0",
     "require-dir": "^0.3.0",
     "should": "^9.0.0",
     "underscore": "^1.8.3",

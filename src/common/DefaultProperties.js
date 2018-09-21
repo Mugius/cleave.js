@@ -12,43 +12,20 @@ var DefaultProperties = {
         target = target || {};
         opts = opts || {};
 
-        // credit card
-        target.creditCard = !!opts.creditCard;
-        target.creditCardStrictMode = !!opts.creditCardStrictMode;
-        target.creditCardType = '';
-        target.onCreditCardTypeChanged = opts.onCreditCardTypeChanged || (function () {});
-
-        // phone
-        target.phone = !!opts.phone;
-        target.phoneRegionCode = opts.phoneRegionCode || 'AU';
-        target.phoneFormatter = {};
-
-        // time
-        target.time = !!opts.time;
-        target.timePattern = opts.timePattern || ['h', 'm', 's'];
-        target.timeFormatter = {};
 
         // date
         target.date = !!opts.date;
         target.datePattern = opts.datePattern || ['d', 'm', 'Y'];
         target.dateFormatter = {};
 
-        // numeral
-        target.numeral = !!opts.numeral;
-        target.numeralIntegerScale = opts.numeralIntegerScale > 0 ? opts.numeralIntegerScale : 0;
-        target.numeralDecimalScale = opts.numeralDecimalScale >= 0 ? opts.numeralDecimalScale : 2;
-        target.numeralDecimalMark = opts.numeralDecimalMark || '.';
-        target.numeralThousandsGroupStyle = opts.numeralThousandsGroupStyle || 'thousand';
-        target.numeralPositiveOnly = !!opts.numeralPositiveOnly;
-        target.stripLeadingZeroes = opts.stripLeadingZeroes !== false;
 
         // others
-        target.numericOnly = target.creditCard || target.date || !!opts.numericOnly;
+        target.numericOnly = target.date;
 
         target.uppercase = !!opts.uppercase;
         target.lowercase = !!opts.lowercase;
 
-        target.prefix = (target.creditCard || target.date) ? '' : (opts.prefix || '');
+        target.prefix = target.date ? '' : (opts.prefix || '');
         target.noImmediatePrefix = !!opts.noImmediatePrefix;
         target.prefixLength = target.prefix.length;
         target.rawValueTrimPrefix = !!opts.rawValueTrimPrefix;
@@ -58,11 +35,7 @@ var DefaultProperties = {
 
         target.delimiter =
             (opts.delimiter || opts.delimiter === '') ? opts.delimiter :
-                (opts.date ? '/' :
-                    (opts.time ? ':' :
-                        (opts.numeral ? ',' :
-                            (opts.phone ? ' ' :
-                                ' '))));
+                (opts.date ? '.' : ' ');
         target.delimiterLength = target.delimiter.length;
         target.delimiterLazyShow = !!opts.delimiterLazyShow;
         target.delimiters = opts.delimiters || [];

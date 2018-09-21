@@ -111,10 +111,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        owner.element.addEventListener('copy', owner.onCopyListener);
 
 
-	        owner.initPhoneFormatter();
 	        owner.initDateFormatter();
-	        owner.initTimeFormatter();
-	        owner.initNumeralFormatter();
 
 	        // avoid touch input field if value is null
 	        // otherwise Firefox will add red box-shadow for <input required />
@@ -123,36 +120,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	    },
 
-	    initNumeralFormatter: function () {
-	        var owner = this, pps = owner.properties;
-
-	        if (!pps.numeral) {
-	            return;
-	        }
-
-	        pps.numeralFormatter = new Cleave.NumeralFormatter(
-	            pps.numeralDecimalMark,
-	            pps.numeralIntegerScale,
-	            pps.numeralDecimalScale,
-	            pps.numeralThousandsGroupStyle,
-	            pps.numeralPositiveOnly,
-	            pps.stripLeadingZeroes,
-	            pps.delimiter
-	        );
-	    },
-
-	    initTimeFormatter: function() {
-	        var owner = this, pps = owner.properties;
-
-	        if (!pps.time) {
-	            return;
-	        }
-
-	        pps.timeFormatter = new Cleave.TimeFormatter(pps.timePattern);
-	        pps.blocks = pps.timeFormatter.getBlocks();
-	        pps.blocksLength = pps.blocks.length;
-	        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);
-	    },
 
 	    initDateFormatter: function () {
 	        var owner = this, pps = owner.properties;
@@ -166,26 +133,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        pps.blocksLength = pps.blocks.length;
 	        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);
 	    },
-
-	    initPhoneFormatter: function () {
-	        var owner = this, pps = owner.properties;
-
-	        if (!pps.phone) {
-	            return;
-	        }
-
-	        // Cleave.AsYouTypeFormatter should be provided by
-	        // external google closure lib
-	        try {
-	            pps.phoneFormatter = new Cleave.PhoneFormatter(
-	                new pps.root.Cleave.AsYouTypeFormatter(pps.phoneRegionCode),
-	                pps.delimiter
-	            );
-	        } catch (ex) {
-	            throw new Error('[cleave.js] Please include phone-type-formatter.{country}.js lib');
-	        }
-	    },
-
 	    onKeyDown: function (event) {
 	        var owner = this, pps = owner.properties,
 	            charCode = event.which || event.keyCode,
@@ -269,39 +216,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	            value = Util.headStr(value, value.length - pps.delimiterLength);
 	        }
 
-	        // phone formatter
-	        if (pps.phone) {
-	            if (pps.prefix && (!pps.noImmediatePrefix || value.length)) {
-	                pps.result = pps.prefix + pps.phoneFormatter.format(value).slice(pps.prefix.length);
-	            } else {
-	                pps.result = pps.phoneFormatter.format(value);
-	            }
-	            owner.updateValueState();
-
-	            return;
-	        }
-
-	        // numeral formatter
-	        if (pps.numeral) {
-	            if (pps.prefix && (!pps.noImmediatePrefix || value.length)) {
-	                pps.result = pps.prefix + pps.numeralFormatter.format(value);
-	            } else {
-	                pps.result = pps.numeralFormatter.format(value);
-	            }
-	            owner.updateValueState();
-
-	            return;
-	        }
 
 	        // date
 	        if (pps.date) {
 	            value = pps.dateFormatter.getValidatedDate(value);
 	        }
 
-	        // time
-	        if (pps.time) {
-	            value = pps.timeFormatter.getValidatedTime(value);
-	        }
 
 	        // strip delimiters
 	        value = Util.stripDelimiters(value, pps.delimiter, pps.delimiters);
@@ -347,30 +267,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        owner.updateValueState();
 	    },
 
-	    updateCreditCardPropsByValue: function (value) {
-	        var owner = this, pps = owner.properties,
-	            Util = Cleave.Util,
-	            creditCardInfo;
-
-	        // At least one of the first 4 characters has changed
-	        if (Util.headStr(pps.result, 4) === Util.headStr(value, 4)) {
-	            return;
-	        }
-
-	        creditCardInfo = Cleave.CreditCardDetector.getInfo(value, pps.creditCardStrictMode);
-
-	        pps.blocks = creditCardInfo.blocks;
-	        pps.blocksLength = pps.blocks.length;
-	        pps.maxLength = Util.getMaxLength(pps.blocks);
-
-	        // credit card type changed
-	        if (pps.creditCardType !== creditCardInfo.type) {
-	            pps.creditCardType = creditCardInfo.type;
-
-	            pps.onCreditCardTypeChanged.call(owner, pps.creditCardType);
-	        }
-	    },
-
 	    updateValueState: function () {
 	        var owner = this,
 	            Util = Cleave.Util,
@@ -413,14 +309,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                rawValue: owner.getRawValue()
 	            }
 	        });
-	    },
-
-	    setPhoneRegionCode: function (phoneRegionCode) {
-	        var owner = this, pps = owner.properties;
-
-	        pps.phoneRegionCode = phoneRegionCode;
-	        owner.initPhoneFormatter();
-	        owner.onChange();
 	    },
 
 	    setRawValue: function (value) {
@@ -483,13 +371,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	};
 
-	Cleave.NumeralFormatter = __webpack_require__(1);
-	Cleave.DateFormatter = __webpack_require__(2);
-	Cleave.TimeFormatter = __webpack_require__(3);
-	Cleave.PhoneFormatter = __webpack_require__(4);
-	Cleave.CreditCardDetector = __webpack_require__(5);
-	Cleave.Util = __webpack_require__(6);
-	Cleave.DefaultProperties = __webpack_require__(7);
+	Cleave.DateFormatter = __webpack_require__(1);
+	Cleave.Util = __webpack_require__(2);
+	Cleave.DefaultProperties = __webpack_require__(3);
 
 	// for angular directive
 	((typeof global === 'object' && global) ? global : window)['Cleave'] = Cleave;
@@ -501,108 +385,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	var NumeralFormatter = function (numeralDecimalMark,
-	                                 numeralIntegerScale,
-	                                 numeralDecimalScale,
-	                                 numeralThousandsGroupStyle,
-	                                 numeralPositiveOnly,
-	                                 stripLeadingZeroes,
-	                                 delimiter) {
-	    var owner = this;
-
-	    owner.numeralDecimalMark = numeralDecimalMark || '.';
-	    owner.numeralIntegerScale = numeralIntegerScale > 0 ? numeralIntegerScale : 0;
-	    owner.numeralDecimalScale = numeralDecimalScale >= 0 ? numeralDecimalScale : 2;
-	    owner.numeralThousandsGroupStyle = numeralThousandsGroupStyle || NumeralFormatter.groupStyle.thousand;
-	    owner.numeralPositiveOnly = !!numeralPositiveOnly;
-	    owner.stripLeadingZeroes = stripLeadingZeroes !== false;
-	    owner.delimiter = (delimiter || delimiter === '') ? delimiter : ',';
-	    owner.delimiterRE = delimiter ? new RegExp('\\' + delimiter, 'g') : '';
-	};
-
-	NumeralFormatter.groupStyle = {
-	    thousand: 'thousand',
-	    lakh:     'lakh',
-	    wan:      'wan',
-	    none:     'none'    
-	};
-
-	NumeralFormatter.prototype = {
-	    getRawValue: function (value) {
-	        return value.replace(this.delimiterRE, '').replace(this.numeralDecimalMark, '.');
-	    },
-
-	    format: function (value) {
-	        var owner = this, parts, partInteger, partDecimal = '';
-
-	        // strip alphabet letters
-	        value = value.replace(/[A-Za-z]/g, '')
-	            // replace the first decimal mark with reserved placeholder
-	            .replace(owner.numeralDecimalMark, 'M')
-
-	            // strip non numeric letters except minus and "M"
-	            // this is to ensure prefix has been stripped
-	            .replace(/[^\dM-]/g, '')
-
-	            // replace the leading minus with reserved placeholder
-	            .replace(/^\-/, 'N')
-
-	            // strip the other minus sign (if present)
-	            .replace(/\-/g, '')
-
-	            // replace the minus sign (if present)
-	            .replace('N', owner.numeralPositiveOnly ? '' : '-')
-
-	            // replace decimal mark
-	            .replace('M', owner.numeralDecimalMark);
-
-	        // strip any leading zeros
-	        if (owner.stripLeadingZeroes) {
-	            value = value.replace(/^(-)?0+(?=\d)/, '$1');
-	        }
-
-	        partInteger = value;
-
-	        if (value.indexOf(owner.numeralDecimalMark) >= 0) {
-	            parts = value.split(owner.numeralDecimalMark);
-	            partInteger = parts[0];
-	            partDecimal = owner.numeralDecimalMark + parts[1].slice(0, owner.numeralDecimalScale);
-	        }
-
-	        if (owner.numeralIntegerScale > 0) {
-	          partInteger = partInteger.slice(0, owner.numeralIntegerScale + (value.slice(0, 1) === '-' ? 1 : 0));
-	        }
-
-	        switch (owner.numeralThousandsGroupStyle) {
-	        case NumeralFormatter.groupStyle.lakh:
-	            partInteger = partInteger.replace(/(\d)(?=(\d\d)+\d$)/g, '$1' + owner.delimiter);
-
-	            break;
-
-	        case NumeralFormatter.groupStyle.wan:
-	            partInteger = partInteger.replace(/(\d)(?=(\d{4})+$)/g, '$1' + owner.delimiter);
-
-	            break;
-
-	        case NumeralFormatter.groupStyle.thousand:
-	            partInteger = partInteger.replace(/(\d)(?=(\d{3})+$)/g, '$1' + owner.delimiter);
-
-	            break;
-	        }
-
-	        return partInteger.toString() + (owner.numeralDecimalScale > 0 ? partDecimal.toString() : '');
-	    }
-	};
-
-	module.exports = NumeralFormatter;
-
-
-/***/ }),
-/* 2 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -775,338 +557,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	var TimeFormatter = function (timePattern) {
-	    var owner = this;
-
-	    owner.time = [];
-	    owner.blocks = [];
-	    owner.timePattern = timePattern;
-	    owner.initBlocks();
-	};
-
-	TimeFormatter.prototype = {
-	    initBlocks: function () {
-	        var owner = this;
-	        owner.timePattern.forEach(function () {
-	            owner.blocks.push(2);
-	        });
-	    },
-
-	    getISOFormatTime: function () {
-	        var owner = this,
-	            time = owner.time;
-
-	        return time[2] ? (
-	            owner.addLeadingZero(time[0]) + ':' + owner.addLeadingZero(time[1]) + ':' + owner.addLeadingZero(time[2])
-	        ) : '';
-	    },
-
-	    getBlocks: function () {
-	        return this.blocks;
-	    },
-
-	    getValidatedTime: function (value) {
-	        var owner = this, result = '';
-
-	        value = value.replace(/[^\d]/g, '');
-
-	        owner.blocks.forEach(function (length, index) {
-	            if (value.length > 0) {
-	                var sub = value.slice(0, length),
-	                    sub0 = sub.slice(0, 1),
-	                    rest = value.slice(length);
-
-	                switch (owner.timePattern[index]) {
-
-	                case 'h':
-	                    if (parseInt(sub0, 10) > 2) {
-	                        sub = '0' + sub0;
-	                    } else if (parseInt(sub, 10) > 23) {
-	                        sub = '23';
-	                    }
-
-	                    break;
-
-	                case 'm':
-	                case 's':
-	                    if (parseInt(sub0, 10) > 5) {
-	                        sub = '0' + sub0;
-	                    } else if (parseInt(sub, 10) > 60) {
-	                        sub = '60';
-	                    }
-	                    break;
-	                }
-
-	                result += sub;
-
-	                // update remaining string
-	                value = rest;
-	            }
-	        });
-
-	        return this.getFixedTimeString(result);
-	    },
-
-	    getFixedTimeString: function (value) {
-	        var owner = this, timePattern = owner.timePattern, time = [],
-	            secondIndex = 0, minuteIndex = 0, hourIndex = 0,
-	            secondStartIndex = 0, minuteStartIndex = 0, hourStartIndex = 0,
-	            second, minute, hour;
-
-	        if (value.length === 6) {
-	            timePattern.forEach(function (type, index) {
-	                switch (type) {
-	                case 's':
-	                    secondIndex = index * 2;
-	                    break;
-	                case 'm':
-	                    minuteIndex = index * 2;
-	                    break;
-	                case 'h':
-	                    hourIndex = index * 2;
-	                    break;
-	                }
-	            });
-
-	            hourStartIndex = hourIndex;
-	            minuteStartIndex = minuteIndex;
-	            secondStartIndex = secondIndex;
-
-	            second = parseInt(value.slice(secondStartIndex, secondStartIndex + 2), 10);
-	            minute = parseInt(value.slice(minuteStartIndex, minuteStartIndex + 2), 10);
-	            hour = parseInt(value.slice(hourStartIndex, hourStartIndex + 2), 10);
-
-	            time = this.getFixedTime(hour, minute, second);
-	        }
-
-	        if (value.length === 4 && owner.timePattern.indexOf('s') < 0) {
-	            timePattern.forEach(function (type, index) {
-	                switch (type) {
-	                case 'm':
-	                    minuteIndex = index * 2;
-	                    break;
-	                case 'h':
-	                    hourIndex = index * 2;
-	                    break;
-	                }
-	            });
-
-	            hourStartIndex = hourIndex;
-	            minuteStartIndex = minuteIndex;
-
-	            second = 0;
-	            minute = parseInt(value.slice(minuteStartIndex, minuteStartIndex + 2), 10);
-	            hour = parseInt(value.slice(hourStartIndex, hourStartIndex + 2), 10);
-
-	            time = this.getFixedTime(hour, minute, second);
-	        }
-
-	        owner.time = time;
-
-	        return time.length === 0 ? value : timePattern.reduce(function (previous, current) {
-	            switch (current) {
-	            case 's':
-	                return previous + owner.addLeadingZero(time[2]);
-	            case 'm':
-	                return previous + owner.addLeadingZero(time[1]);
-	            case 'h':
-	                return previous + owner.addLeadingZero(time[0]);
-	            }
-	        }, '');
-	    },
-
-	    getFixedTime: function (hour, minute, second) {
-	        second = Math.min(parseInt(second || 0, 10), 60);
-	        minute = Math.min(minute, 60);
-	        hour = Math.min(hour, 60);
-
-	        return [hour, minute, second];
-	    },
-
-	    addLeadingZero: function (number) {
-	        return (number < 10 ? '0' : '') + number;
-	    }
-	};
-
-	module.exports = TimeFormatter;
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	var PhoneFormatter = function (formatter, delimiter) {
-	    var owner = this;
-
-	    owner.delimiter = (delimiter || delimiter === '') ? delimiter : ' ';
-	    owner.delimiterRE = delimiter ? new RegExp('\\' + delimiter, 'g') : '';
-
-	    owner.formatter = formatter;
-	};
-
-	PhoneFormatter.prototype = {
-	    setFormatter: function (formatter) {
-	        this.formatter = formatter;
-	    },
-
-	    format: function (phoneNumber) {
-	        var owner = this;
-
-	        owner.formatter.clear();
-
-	        // only keep number and +
-	        phoneNumber = phoneNumber.replace(/[^\d+]/g, '');
-
-	        // strip non-leading +
-	        phoneNumber = phoneNumber.replace(/^\+/, 'B').replace(/\+/g, '').replace('B', '+');
-
-	        // strip delimiter
-	        phoneNumber = phoneNumber.replace(owner.delimiterRE, '');
-
-	        var result = '', current, validated = false;
-
-	        for (var i = 0, iMax = phoneNumber.length; i < iMax; i++) {
-	            current = owner.formatter.inputDigit(phoneNumber.charAt(i));
-
-	            // has ()- or space inside
-	            if (/[\s()-]/g.test(current)) {
-	                result = current;
-
-	                validated = true;
-	            } else {
-	                if (!validated) {
-	                    result = current;
-	                }
-	                // else: over length input
-	                // it turns to invalid number again
-	            }
-	        }
-
-	        // strip ()
-	        // e.g. US: 7161234567 returns (716) 123-4567
-	        result = result.replace(/[()]/g, '');
-	        // replace library delimiter with user customized delimiter
-	        result = result.replace(/[\s-]/g, owner.delimiter);
-
-	        return result;
-	    }
-	};
-
-	module.exports = PhoneFormatter;
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-	'use strict';
-
-	var CreditCardDetector = {
-	    blocks: {
-	        uatp:          [4, 5, 6],
-	        amex:          [4, 6, 5],
-	        diners:        [4, 6, 4],
-	        discover:      [4, 4, 4, 4],
-	        mastercard:    [4, 4, 4, 4],
-	        dankort:       [4, 4, 4, 4],
-	        instapayment:  [4, 4, 4, 4],
-	        jcb15:         [4, 6, 5],
-	        jcb:           [4, 4, 4, 4],
-	        maestro:       [4, 4, 4, 4],
-	        visa:          [4, 4, 4, 4],
-	        mir:           [4, 4, 4, 4],
-	        unionPay:      [4, 4, 4, 4],
-	        general:       [4, 4, 4, 4],
-	        generalStrict: [4, 4, 4, 7]
-	    },
-
-	    re: {
-	        // starts with 1; 15 digits, not starts with 1800 (jcb card)
-	        uatp: /^(?!1800)1\d{0,14}/,
-
-	        // starts with 34/37; 15 digits
-	        amex: /^3[47]\d{0,13}/,
-
-	        // starts with 6011/65/644-649; 16 digits
-	        discover: /^(?:6011|65\d{0,2}|64[4-9]\d?)\d{0,12}/,
-
-	        // starts with 300-305/309 or 36/38/39; 14 digits
-	        diners: /^3(?:0([0-5]|9)|[689]\d?)\d{0,11}/,
-
-	        // starts with 51-55/2221–2720; 16 digits
-	        mastercard: /^(5[1-5]\d{0,2}|22[2-9]\d{0,1}|2[3-7]\d{0,2})\d{0,12}/,
-
-	        // starts with 5019/4175/4571; 16 digits
-	        dankort: /^(5019|4175|4571)\d{0,12}/,
-
-	        // starts with 637-639; 16 digits
-	        instapayment: /^63[7-9]\d{0,13}/,
-
-	        // starts with 2131/1800; 15 digits
-	        jcb15: /^(?:2131|1800)\d{0,11}/,
-
-	        // starts with 2131/1800/35; 16 digits
-	        jcb: /^(?:35\d{0,2})\d{0,12}/,
-
-	        // starts with 50/56-58/6304/67; 16 digits
-	        maestro: /^(?:5[0678]\d{0,2}|6304|67\d{0,2})\d{0,12}/,
-
-	        // starts with 22; 16 digits
-	        mir: /^220[0-4]\d{0,12}/,
-
-	        // starts with 4; 16 digits
-	        visa: /^4\d{0,15}/,
-
-	        // starts with 62; 16 digits
-	        unionPay: /^62\d{0,14}/
-	    },
-
-	    getInfo: function (value, strictMode) {
-	        var blocks = CreditCardDetector.blocks,
-	            re = CreditCardDetector.re;
-
-	        // Some credit card can have up to 19 digits number.
-	        // Set strictMode to true will remove the 16 max-length restrain,
-	        // however, I never found any website validate card number like
-	        // this, hence probably you don't want to enable this option.
-	        strictMode = !!strictMode;
-
-	        for (var key in re) {
-	            if (re[key].test(value)) {
-	                var block;
-
-	                if (strictMode) {
-	                    block = blocks.generalStrict;
-	                } else {
-	                    block = blocks[key];
-	                }
-
-	                return {
-	                    type: key,
-	                    blocks: block
-	                };
-	            }
-	        }
-
-	        return {
-	            type:   'unknown',
-	            blocks: strictMode ? blocks.generalStrict : blocks.general
-	        };
-	    }
-	};
-
-	module.exports = CreditCardDetector;
-
-
-/***/ }),
-/* 6 */
+/* 2 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -1335,7 +786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 7 */
+/* 3 */
 /***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -1352,43 +803,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        target = target || {};
 	        opts = opts || {};
 
-	        // credit card
-	        target.creditCard = !!opts.creditCard;
-	        target.creditCardStrictMode = !!opts.creditCardStrictMode;
-	        target.creditCardType = '';
-	        target.onCreditCardTypeChanged = opts.onCreditCardTypeChanged || (function () {});
-
-	        // phone
-	        target.phone = !!opts.phone;
-	        target.phoneRegionCode = opts.phoneRegionCode || 'AU';
-	        target.phoneFormatter = {};
-
-	        // time
-	        target.time = !!opts.time;
-	        target.timePattern = opts.timePattern || ['h', 'm', 's'];
-	        target.timeFormatter = {};
 
 	        // date
 	        target.date = !!opts.date;
 	        target.datePattern = opts.datePattern || ['d', 'm', 'Y'];
 	        target.dateFormatter = {};
 
-	        // numeral
-	        target.numeral = !!opts.numeral;
-	        target.numeralIntegerScale = opts.numeralIntegerScale > 0 ? opts.numeralIntegerScale : 0;
-	        target.numeralDecimalScale = opts.numeralDecimalScale >= 0 ? opts.numeralDecimalScale : 2;
-	        target.numeralDecimalMark = opts.numeralDecimalMark || '.';
-	        target.numeralThousandsGroupStyle = opts.numeralThousandsGroupStyle || 'thousand';
-	        target.numeralPositiveOnly = !!opts.numeralPositiveOnly;
-	        target.stripLeadingZeroes = opts.stripLeadingZeroes !== false;
 
 	        // others
-	        target.numericOnly = target.creditCard || target.date || !!opts.numericOnly;
+	        target.numericOnly = target.date;
 
 	        target.uppercase = !!opts.uppercase;
 	        target.lowercase = !!opts.lowercase;
 
-	        target.prefix = (target.creditCard || target.date) ? '' : (opts.prefix || '');
+	        target.prefix = target.date ? '' : (opts.prefix || '');
 	        target.noImmediatePrefix = !!opts.noImmediatePrefix;
 	        target.prefixLength = target.prefix.length;
 	        target.rawValueTrimPrefix = !!opts.rawValueTrimPrefix;
@@ -1398,11 +826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        target.delimiter =
 	            (opts.delimiter || opts.delimiter === '') ? opts.delimiter :
-	                (opts.date ? '/' :
-	                    (opts.time ? ':' :
-	                        (opts.numeral ? ',' :
-	                            (opts.phone ? ' ' :
-	                                ' '))));
+	                (opts.date ? '.' : ' ');
 	        target.delimiterLength = target.delimiter.length;
 	        target.delimiterLazyShow = !!opts.delimiterLazyShow;
 	        target.delimiters = opts.delimiters || [];
