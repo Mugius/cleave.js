@@ -184,11 +184,6 @@ Cleave.prototype = {
             }
         }
 
-        // update credit card props
-        if (pps.creditCard) {
-            owner.updateCreditCardPropsByValue(value);
-        }
-
         // strip over length characters
         value = Util.headStr(value, pps.maxLength);
 
@@ -296,7 +291,6 @@ Cleave.prototype = {
 
         owner.element.removeEventListener('input', owner.onChangeListener);
         owner.element.removeEventListener('keydown', owner.onKeyDownListener);
-        owner.element.removeEventListener('focus', owner.onFocusListener);
         owner.element.removeEventListener('cut', owner.onCutListener);
         owner.element.removeEventListener('copy', owner.onCopyListener);
     },
