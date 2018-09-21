@@ -148,27 +148,6 @@ var Util = {
         return result;
     },
 
-    // move cursor to the end
-    // the first time user focuses on an input with prefix
-    fixPrefixCursor: function (el, prefix, delimiter, delimiters) {
-        if (!el) {
-            return;
-        }
-
-        var val = el.value,
-            appendix = delimiter || (delimiters[0] || ' ');
-
-        if (!el.setSelectionRange || !prefix || (prefix.length + appendix.length) < val.length) {
-            return;
-        }
-
-        var len = val.length * 2;
-
-        // set timeout to avoid blink
-        setTimeout(function () {
-            el.setSelectionRange(len, len);
-        }, 1);
-    },
 
     setSelection: function (element, position, doc) {
         if (element !== this.getActiveElement(doc)) {

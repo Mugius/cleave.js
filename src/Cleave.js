@@ -31,7 +31,7 @@ Cleave.prototype = {
         var owner = this, pps = owner.properties;
 
         // no need to use this lib
-        if (!pps.numeral && !pps.phone && !pps.creditCard && !pps.time && !pps.date && (pps.blocksLength === 0 && !pps.prefix)) {
+        if (!pps.date && (pps.blocksLength === 0 && !pps.prefix)) {
             owner.onInput(pps.initValue);
 
             return;
@@ -44,13 +44,11 @@ Cleave.prototype = {
 
         owner.onChangeListener = owner.onChange.bind(owner);
         owner.onKeyDownListener = owner.onKeyDown.bind(owner);
-        owner.onFocusListener = owner.onFocus.bind(owner);
         owner.onCutListener = owner.onCut.bind(owner);
         owner.onCopyListener = owner.onCopy.bind(owner);
 
         owner.element.addEventListener('input', owner.onChangeListener);
         owner.element.addEventListener('keydown', owner.onKeyDownListener);
-        owner.element.addEventListener('focus', owner.onFocusListener);
         owner.element.addEventListener('cut', owner.onCutListener);
         owner.element.addEventListener('copy', owner.onCopyListener);
 
@@ -103,13 +101,6 @@ Cleave.prototype = {
 
     onChange: function () {
         this.onInput(this.element.value);
-    },
-
-    onFocus: function () {
-        var owner = this,
-            pps = owner.properties;
-
-        Cleave.Util.fixPrefixCursor(owner.element, pps.prefix, pps.delimiter, pps.delimiters);
     },
 
     onCut: function (e) {

@@ -13,11 +13,7 @@ DateFormatter.prototype = {
     initBlocks: function () {
         var owner = this;
         owner.datePattern.forEach(function (value) {
-            if (value === 'Y') {
-                owner.blocks.push(4);
-            } else {
                 owner.blocks.push(2);
-            }
         });
     },
 
@@ -83,7 +79,7 @@ DateFormatter.prototype = {
         var owner = this, datePattern = owner.datePattern, date = [],
             dayIndex = 0, monthIndex = 0, yearIndex = 0,
             dayStartIndex = 0, monthStartIndex = 0, yearStartIndex = 0,
-            day, month, year, fullYearDone = false;
+            day, month, year = false;
 
         // mm-dd || dd-mm
         if (value.length === 4 && datePattern[0].toLowerCase() !== 'y' && datePattern[1].toLowerCase() !== 'y') {
@@ -95,8 +91,8 @@ DateFormatter.prototype = {
             date = this.getFixedDate(day, month, 0);
         }
 
-        // yyyy-mm-dd || yyyy-dd-mm || mm-dd-yyyy || dd-mm-yyyy || dd-yyyy-mm || mm-yyyy-dd
-        if (value.length === 8) {
+        // yy-mm-dd || yy-dd-mm || mm-dd-yy || dd-mm-yy || dd-yy-mm || mm-yy-dd
+        if (value.length === 6) {
             datePattern.forEach(function (type, index) {
                 switch (type) {
                 case 'd':
@@ -117,9 +113,7 @@ DateFormatter.prototype = {
 
             day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);
             month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
-            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);
-
-            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;
+            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 2), 10);
 
             date = this.getFixedDate(day, month, year);
         }
@@ -133,7 +127,7 @@ DateFormatter.prototype = {
             case 'm':
                 return previous + owner.addLeadingZero(date[1]);
             default:
-                return previous + (fullYearDone ? owner.addLeadingZeroForYear(date[2]) : '');
+                return previous + owner.addLeadingZero(date[2]);
             }
         }, '');
     },
@@ -156,10 +150,6 @@ DateFormatter.prototype = {
 
     addLeadingZero: function (number) {
         return (number < 10 ? '0' : '') + number;
-    },
-
-    addLeadingZeroForYear: function (number) {
-        return (number < 10 ? '000' : (number < 100 ? '00' : (number < 1000 ? '0' : ''))) + number;
     }
 };
 

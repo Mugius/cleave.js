@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var owner = this, pps = owner.properties;
 
 	        // no need to use this lib
-	        if (!pps.numeral && !pps.phone && !pps.creditCard && !pps.time && !pps.date && (pps.blocksLength === 0 && !pps.prefix)) {
+	        if (!pps.date && (pps.blocksLength === 0 && !pps.prefix)) {
 	            owner.onInput(pps.initValue);
 
 	            return;
@@ -100,13 +100,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        owner.onChangeListener = owner.onChange.bind(owner);
 	        owner.onKeyDownListener = owner.onKeyDown.bind(owner);
-	        owner.onFocusListener = owner.onFocus.bind(owner);
 	        owner.onCutListener = owner.onCut.bind(owner);
 	        owner.onCopyListener = owner.onCopy.bind(owner);
 
 	        owner.element.addEventListener('input', owner.onChangeListener);
 	        owner.element.addEventListener('keydown', owner.onKeyDownListener);
-	        owner.element.addEventListener('focus', owner.onFocusListener);
 	        owner.element.addEventListener('cut', owner.onCutListener);
 	        owner.element.addEventListener('copy', owner.onCopyListener);
 
@@ -159,13 +157,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    onChange: function () {
 	        this.onInput(this.element.value);
-	    },
-
-	    onFocus: function () {
-	        var owner = this,
-	            pps = owner.properties;
-
-	        Cleave.Util.fixPrefixCursor(owner.element, pps.prefix, pps.delimiter, pps.delimiters);
 	    },
 
 	    onCut: function (e) {
@@ -402,11 +393,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    initBlocks: function () {
 	        var owner = this;
 	        owner.datePattern.forEach(function (value) {
-	            if (value === 'Y') {
-	                owner.blocks.push(4);
-	            } else {
 	                owner.blocks.push(2);
-	            }
 	        });
 	    },
 
@@ -472,7 +459,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var owner = this, datePattern = owner.datePattern, date = [],
 	            dayIndex = 0, monthIndex = 0, yearIndex = 0,
 	            dayStartIndex = 0, monthStartIndex = 0, yearStartIndex = 0,
-	            day, month, year, fullYearDone = false;
+	            day, month, year = false;
 
 	        // mm-dd || dd-mm
 	        if (value.length === 4 && datePattern[0].toLowerCase() !== 'y' && datePattern[1].toLowerCase() !== 'y') {
@@ -484,8 +471,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            date = this.getFixedDate(day, month, 0);
 	        }
 
-	        // yyyy-mm-dd || yyyy-dd-mm || mm-dd-yyyy || dd-mm-yyyy || dd-yyyy-mm || mm-yyyy-dd
-	        if (value.length === 8) {
+	        // yy-mm-dd || yy-dd-mm || mm-dd-yy || dd-mm-yy || dd-yy-mm || mm-yy-dd
+	        if (value.length === 6) {
 	            datePattern.forEach(function (type, index) {
 	                switch (type) {
 	                case 'd':
@@ -506,9 +493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);
 	            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
-	            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);
-
-	            fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;
+	            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 2), 10);
 
 	            date = this.getFixedDate(day, month, year);
 	        }
@@ -522,7 +507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            case 'm':
 	                return previous + owner.addLeadingZero(date[1]);
 	            default:
-	                return previous + (fullYearDone ? owner.addLeadingZeroForYear(date[2]) : '');
+	                return previous + owner.addLeadingZero(date[2]);
 	            }
 	        }, '');
 	    },
@@ -545,10 +530,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    addLeadingZero: function (number) {
 	        return (number < 10 ? '0' : '') + number;
-	    },
-
-	    addLeadingZeroForYear: function (number) {
-	        return (number < 10 ? '000' : (number < 100 ? '00' : (number < 1000 ? '0' : ''))) + number;
 	    }
 	};
 
@@ -710,27 +691,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return result;
 	    },
 
-	    // move cursor to the end
-	    // the first time user focuses on an input with prefix
-	    fixPrefixCursor: function (el, prefix, delimiter, delimiters) {
-	        if (!el) {
-	            return;
-	        }
-
-	        var val = el.value,
-	            appendix = delimiter || (delimiters[0] || ' ');
-
-	        if (!el.setSelectionRange || !prefix || (prefix.length + appendix.length) < val.length) {
-	            return;
-	        }
-
-	        var len = val.length * 2;
-
-	        // set timeout to avoid blink
-	        setTimeout(function () {
-	            el.setSelectionRange(len, len);
-	        }, 1);
-	    },
 
 	    setSelection: function (element, position, doc) {
 	        if (element !== this.getActiveElement(doc)) {
@@ -826,7 +786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        target.delimiter =
 	            (opts.delimiter || opts.delimiter === '') ? opts.delimiter :
-	                (opts.date ? '.' : ' ');
+	                (opts.date ? '/' : ' ');
 	        target.delimiterLength = target.delimiter.length;
 	        target.delimiterLazyShow = !!opts.delimiterLazyShow;
 	        target.delimiters = opts.delimiters || [];
