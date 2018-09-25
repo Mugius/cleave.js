@@ -17,6 +17,7 @@ var DefaultProperties = {
         target.date = !!opts.date;
         target.datePattern = opts.datePattern || ['d', 'm', 'Y'];
         target.dateFormatter = {};
+        target.yearLength = opts.yearLength || 4;
 
 
         // others

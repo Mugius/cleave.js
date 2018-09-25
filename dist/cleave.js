@@ -126,7 +126,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return;
 	        }
 
-	        pps.dateFormatter = new Cleave.DateFormatter(pps.datePattern);
+	        pps.dateFormatter = new Cleave.DateFormatter(pps);
 	        pps.blocks = pps.dateFormatter.getBlocks();
 	        pps.blocksLength = pps.blocks.length;
 	        pps.maxLength = Cleave.Util.getMaxLength(pps.blocks);
@@ -374,12 +374,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var DateFormatter = function (datePattern) {
+	var DateFormatter = function (pps) {
 	    var owner = this;
 
 	    owner.date = [];
 	    owner.blocks = [];
-	    owner.datePattern = datePattern;
+	    owner.datePattern = pps.datePattern;
+	    owner.pps = pps;
 	    owner.initBlocks();
 	};
 
@@ -387,7 +388,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    initBlocks: function () {
 	        var owner = this;
 	        owner.datePattern.forEach(function (value) {
+	            if (value === 'Y' && owner.pps.yearLength === 4) {
+	                owner.blocks.push(4);
+	            } else {
 	                owner.blocks.push(2);
+	            }
 	        });
 	    },
 
@@ -453,7 +458,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var owner = this, datePattern = owner.datePattern, date = [],
 	            dayIndex = 0, monthIndex = 0, yearIndex = 0,
 	            dayStartIndex = 0, monthStartIndex = 0, yearStartIndex = 0,
-	            day, month, year = false;
+	            day, month, year, fullYearDone = false;
 
 	        // mm-dd || dd-mm
 	        if (value.length === 4 && datePattern[0].toLowerCase() !== 'y' && datePattern[1].toLowerCase() !== 'y') {
@@ -466,7 +471,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        // yy-mm-dd || yy-dd-mm || mm-dd-yy || dd-mm-yy || dd-yy-mm || mm-yy-dd
-	        if (value.length === 6) {
+	        if ((owner.pps.yearLength === 4 && value.length === 8) || (owner.pps.yearLength === 2 && value.length === 6)) {
 	            datePattern.forEach(function (type, index) {
 	                switch (type) {
 	                case 'd':
@@ -487,7 +492,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            day = parseInt(value.slice(dayStartIndex, dayStartIndex + 2), 10);
 	            month = parseInt(value.slice(monthStartIndex, monthStartIndex + 2), 10);
-	            year = parseInt(value.slice(yearStartIndex, yearStartIndex + 2), 10);
+	            if(owner.pps.yearLength === 4){
+	                fullYearDone = value.slice(yearStartIndex, yearStartIndex + 4).length === 4;
+	                year = parseInt(value.slice(yearStartIndex, yearStartIndex + 4), 10);
+	            } else {
+	                year = parseInt(value.slice(yearStartIndex, yearStartIndex + 2), 10);
+	            }
+	           
 
 	            date = this.getFixedDate(day, month, year);
 	        }
@@ -762,6 +773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        target.date = !!opts.date;
 	        target.datePattern = opts.datePattern || ['d', 'm', 'Y'];
 	        target.dateFormatter = {};
+	        target.yearLength = opts.yearLength || 4;
 
 
 	        // others
